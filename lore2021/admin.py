@@ -30,13 +30,13 @@ class GameAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
+        'percentage',
         'glength',
         'hours',
         'total',
         'funders',
         'priority',
         'favorite',
-        'total',
         'added',
         'ready',
     )

@@ -33,6 +33,10 @@ class Game(models.Model):
     started = models.DateField(verbose_name='Run started', null=True, default=None)
     ended = models.DateField(verbose_name='Run ended', null=True, default=None)
 
+    @property
+    def percentage(self):
+        return int(self.priority*100/self.hours)/100
+
     def update_calc(self):
         amount = 0.0
         funders = set()
@@ -48,7 +52,7 @@ class Game(models.Model):
         self.save()
 
     def __str__(self):
-        return self.name + " " + str(self.priority)
+        return self.name + " [" + str(self.percentage) + "]"
 
 
 
