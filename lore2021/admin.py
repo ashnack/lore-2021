@@ -17,7 +17,7 @@ from .models import Person, Game, Donation
 class PersonAdmin(admin.ModelAdmin):
     icon_name = 'person'
 
-    list_display = ('id', 'username', 'donator_since')
+    list_display = ('username', 'donator_since')
     list_filter = ('donator_since',)
 
     search_fields = ('slugname', )
@@ -28,7 +28,6 @@ class GameAdmin(admin.ModelAdmin):
     icon_name = 'gamepad'
 
     list_display = (
-        'id',
         'name',
         'percentage',
         'glength',
@@ -57,7 +56,8 @@ class GameAdmin(admin.ModelAdmin):
             request,
             "website.html",
             {
-                'games': Game.objects.filter(ready=None).filter(to_export=True).order_by('glength', '-priority').all()
+                'games': Game.objects.filter(ready=None)
+                    .filter(to_export=True).filter(total__gt=0).order_by('glength', '-priority').all()
             }
         )
 
@@ -71,13 +71,12 @@ class DonationAdmin(admin.ModelAdmin):
     icon_name = 'attach_money'
 
     list_display = (
-        'id',
+        'interest',
+        'donator',
         'amount',
         'source',
-        'donator',
         'during',
         'when',
-        'interest',
         'gifted',
     )
     list_filter = ('donator', 'during', 'when', 'interest', 'gifted')
