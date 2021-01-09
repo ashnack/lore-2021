@@ -87,5 +87,10 @@ class Donation(models.Model):
         if 'dnu' not in kwargs:
             self.interest.update_calc()
 
+    def delete(self, *args, **kwargs):
+        game_id = self.interest.pk
+        super().delete(*args, **kwargs)
+        Game.objects.get(pk=game_id).update_calc()
+
     def __str__(self):
         return str(self.donator) + " gave " + str(self.amount) + " " + str(self.interest.name)
