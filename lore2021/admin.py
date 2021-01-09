@@ -43,6 +43,24 @@ class GameAdmin(admin.ModelAdmin):
     list_filter = ('favorite', 'ready', 'glength')
     search_fields = ('name',)
 
+    change_list_template = "changelist_www.html"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('website-export/', self.for_website),
+        ]
+        return my_urls + urls
+
+    def for_website(self, request):
+        return render(
+            request,
+            "website.html",
+            {
+                Game.objects.filter(ready=None).filter(to_export=True).order_by('glength', '-priority').all()
+            }
+        )
+
 
 class ImportForm(forms.Form):
     file = forms.FileField()
@@ -85,7 +103,7 @@ class DonationAdmin(admin.ModelAdmin):
             while i < data_length:
                 text = str(data[data_keys[0]][6][i])
                 if text:
-                    sorter = int(data[data_keys[0]][3][i])
+                    sorter = int(data[data_keys[0]][3][i]) if data[data_keys[0]][3][i] else 0
                     j = 2
                     if sorter < 15:
                         j = 0
