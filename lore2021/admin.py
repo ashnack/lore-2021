@@ -57,7 +57,7 @@ class GameAdmin(admin.ModelAdmin):
             request,
             "website.html",
             {
-                Game.objects.filter(ready=None).filter(to_export=True).order_by('glength', '-priority').all()
+                'games': Game.objects.filter(ready=None).filter(to_export=True).order_by('glength', '-priority').all()
             }
         )
 

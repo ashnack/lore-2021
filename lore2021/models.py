@@ -37,6 +37,10 @@ class Game(models.Model):
     def percentage(self):
         return int(self.priority*100/self.hours)/100
 
+    @property
+    def game_length(self):
+        return Game.GameLengths.choices[self.glength][1]
+
     def update_calc(self):
         amount = 0.0
         funders = set()
