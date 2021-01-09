@@ -1,0 +1,9 @@
+{% extends 'admin/change_list.html' %}
+
+{% block object-tools %}
+    <div class="fixed-action-btn">
+        <a href="import/" title="Import ods" class="btn-floating"><i class="material-icons">attach_file</i></a> &nbsp; &nbsp; &nbsp; &nbsp;
+         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    </div>
+    {{ block.super }}
+{% endblock %}

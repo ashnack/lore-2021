@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  #redis:
+  #  image: "redis:alpine"
+  #  ports:
+  #    - "6379"
+  #  sysctls:
+  #    net.core.somaxconn: '65535'
+
+  admin:
+    image: admin
+    build: .
+    command: >
+        sh -c "
+          python manage.py generate_secret_key --replace
+          python manage.py migrate
+          python manage.py runserver 0.0.0.0:2021"
+    volumes:
+      - .:/code
+    ports:
+      - "2021:2021"
