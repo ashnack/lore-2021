@@ -115,12 +115,15 @@ class DonationAdmin(admin.ModelAdmin):
                     except IndexError:
                         lore_choice = ''
                     since = now() - timedelta(days=int(data[data_keys[0]][7][i]))
-                    game, created = Game.objects.get_or_create(name=text)
-                    game.glength = j
-                    game.hours = sorter
-                    game.favorite = True if lore_choice else False
-                    game.added = since
-                    game.save()
+                    game, created = Game.objects.get_or_create(
+                        name=text,
+                        defaults={
+                            'glength': j,
+                            'hours': sorter,
+                            'favorite': True if lore_choice else False,
+                            'added': since
+                        }
+                    )
                     Donation.objects.filter(interest=game).filter(source=9).delete()
                     k = 8
                     try:

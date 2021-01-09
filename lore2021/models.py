@@ -26,7 +26,7 @@ class Game(models.Model):
     favorite = models.BooleanField(null=False, blank=False, default=False)
     to_export = models.BooleanField(null=False, blank=False, default=True, verbose_name="Export this game to the website")
     total = models.FloatField(null=False, blank=False, default=0.0)
-    funders = models.FloatField(null=False, blank=False, default=0)
+    funders = models.IntegerField(null=False, blank=False, default=0)
     priority = models.IntegerField(null=False, blank=False, default=0)
     added = models.DateField(auto_now_add=True)
     ready = models.DateField(verbose_name='Run funded', null=True, default=None)
