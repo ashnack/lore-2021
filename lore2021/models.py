@@ -1,6 +1,7 @@
 from math import sqrt
 
 from django.db import models
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
@@ -11,6 +12,9 @@ class Person(models.Model):
 
     def __str__(self):
         return self.username
+
+    class Meta:
+        ordering = ['slugname']
 
 
 class Game(models.Model):
@@ -29,13 +33,17 @@ class Game(models.Model):
     funders = models.IntegerField(null=False, blank=False, default=0)
     priority = models.IntegerField(null=False, blank=False, default=0)
     added = models.DateField(auto_now_add=True)
-    ready = models.DateField(verbose_name='Run funded', null=True, default=None)
-    started = models.DateField(verbose_name='Run started', null=True, default=None)
-    ended = models.DateField(verbose_name='Run ended', null=True, default=None)
+    ready = models.DateField(verbose_name='Run funded', null=True, default=None, blank=True)
+    started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
+    ended = models.DateField(verbose_name='Run ended', null=True, default=None, blank=True)
 
     @property
     def percentage(self):
-        return int(self.priority*100/self.hours)/100
+        percentage = int(self.priority*100/self.hours)/100
+        if percentage >=100 and not self.ready:
+            self.ready = now()
+            self.save()
+        return percentage
 
     @property
     def game_length(self):
@@ -57,6 +65,9 @@ class Game(models.Model):
 
     def __str__(self):
         return self.name + " [" + str(self.percentage) + "]"
+
+    class Meta:
+        ordering = ['name']
 
 
 
