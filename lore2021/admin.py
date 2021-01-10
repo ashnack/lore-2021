@@ -10,12 +10,12 @@ from datetime import timedelta
 
 from pyexcel_ods import get_data
 
-from .models import Person, Game, Donation
+from .models import Person, Game, Donation, DealerChoice
 
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    icon_name = 'person'
+    icon_name = 'assignment_ind'
 
     list_display = ('username', 'donator_since')
     list_filter = ('donator_since',)
@@ -161,4 +161,30 @@ class DonationAdmin(admin.ModelAdmin):
         payload = {"form": form}
         return render(
             request, "form.html", payload
+        )
+
+
+@admin.register(DealerChoice)
+class DealerChoiceAdmin(admin.ModelAdmin):
+    icon_name = 'accessibility_new'
+    change_list_template = "changelist_choice.html"
+
+    list_display = ('donator', 'amount', 'when', 'during')
+    list_filter = ('donator', 'when', 'during')
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('allocate/', self.allocate),
+        ]
+        return my_urls + urls
+
+    def allocate(self, request):
+        if request.method == "POST":
+            self.message_user(request, "Your amount was allocated")
+            return redirect("..")
+        form = ImportForm()
+        payload = {"form": form}
+        return render(
+            request, "allocate.html", payload
         )

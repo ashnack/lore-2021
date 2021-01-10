@@ -1,0 +1,9 @@
+{% extends 'admin/change_list.html' %}
+
+{% block object-tools %}
+    <div class="fixed-action-btn">
+        <a href="allocate/" title="Allocate Dealer's choice" class="btn-floating"><i class="material-icons">note_add</i></a> &nbsp; &nbsp; &nbsp; &nbsp;
+         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    </div>
+    {{ block.super }}
+{% endblock %}

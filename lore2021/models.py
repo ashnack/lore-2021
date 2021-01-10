@@ -84,6 +84,7 @@ class Donation(models.Model):
         PATREON = 7, _('Patreon')
         ADS = 8, _('Ad revenue')
         IMPORTATION = 9, _('Imported')
+        DEALER = 10, _('Dealer Choice input')
 
     amount = models.FloatField(null=False, blank=False)
     source = models.IntegerField(choices=DonationSource.choices)
@@ -105,3 +106,21 @@ class Donation(models.Model):
 
     def __str__(self):
         return str(self.donator) + " gave " + str(self.amount) + " " + str(self.interest.name)
+
+
+class DealerChoice(models.Model):
+    donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
+    amount = models.FloatField(null=False, blank=False)
+    during = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
+    when = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.donator) + " $" + str(self.amount)
+
+
+class Variables(models.Model):
+    class VariableList(models.IntegerChoices):
+        OTHER = 0, _("Allocated dealer's choice")
+
+    variable = models.IntegerField(choices=VariableList.choices, unique=True)
+    value = models.CharField(max_length=200, blank=False, null=False)

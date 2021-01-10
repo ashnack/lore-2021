@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <div>
+        <h1>This importation will remove any previous imported donations</h1>
+        <h2>Make sure you are okay with that before uploading a file.</h2>
+        <form action="." method="POST" enctype="multipart/form-data">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <button type="submit" class="btn">Upload file</button>
+        </form>
+    </div>
+{% endblock %}
