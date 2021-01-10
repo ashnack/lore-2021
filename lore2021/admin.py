@@ -1,7 +1,6 @@
 # ./manage.py admin_generator lore2021
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from django.forms import forms
 from django.shortcuts import redirect, render
 from django.urls import path
 from django.utils.text import slugify
@@ -10,6 +9,7 @@ from datetime import timedelta
 
 from pyexcel_ods import get_data
 
+from .forms import ImportForm, AllocateForm
 from .models import Person, Game, Donation, DealerChoice
 
 
@@ -60,10 +60,6 @@ class GameAdmin(admin.ModelAdmin):
                     .filter(to_export=True).filter(total__gt=0).order_by('glength', '-priority').all()
             }
         )
-
-
-class ImportForm(forms.Form):
-    file = forms.FileField()
 
 
 @admin.register(Donation)
@@ -183,7 +179,7 @@ class DealerChoiceAdmin(admin.ModelAdmin):
         if request.method == "POST":
             self.message_user(request, "Your amount was allocated")
             return redirect("..")
-        form = ImportForm()
+        form = AllocateForm()
         payload = {"form": form}
         return render(
             request, "allocate.html", payload

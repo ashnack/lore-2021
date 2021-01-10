@@ -86,12 +86,12 @@ class Donation(models.Model):
         IMPORTATION = 9, _('Imported')
         DEALER = 10, _('Dealer Choice input')
 
+    donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
     amount = models.FloatField(null=False, blank=False)
     source = models.IntegerField(choices=DonationSource.choices)
-    donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
-    during = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
-    when = models.DateTimeField(auto_now_add=True)
     interest = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, related_name='donations')
+    when = models.DateTimeField(auto_now_add=True)
+    during = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
     gifted = models.ForeignKey(Person, on_delete=models.CASCADE, null=True, blank=True, related_name='gifted_interest')
 
     def save(self, *args, **kwargs):
