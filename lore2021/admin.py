@@ -75,6 +75,7 @@ class DonationAdmin(admin.ModelAdmin):
         'when',
         'gifted',
     )
+    fields = ('source', 'donator', 'amount', 'interest', 'during', 'gifted')
     list_filter = ('donator', 'during', 'when', 'interest', 'gifted')
     autocomplete_fields = ('donator', 'interest', 'gifted', 'during')
 

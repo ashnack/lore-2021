@@ -85,6 +85,7 @@ class Donation(models.Model):
         ADS = 8, _('Ad revenue')
         IMPORTATION = 9, _('Imported')
         DEALER = 10, _('Dealer Choice input')
+        CREDIT = 11, _('Lore credits')
 
     donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
     amount = models.FloatField(null=False, blank=False)

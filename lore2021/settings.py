@@ -123,3 +123,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+MATERIAL_ADMIN_SITE = {
+    'HEADER':  'You are appreciated',  # Admin site header
+    'TITLE':  '2021',  # Admin site title
+    'FAVICON':  'favicon.png',  # Admin site favicon (path to static should be specified)
+    # 'MAIN_BG_COLOR':  '#004400',  # Admin site main color, css color should be specified
+    'MAIN_HOVER_COLOR':  '#004400',  # Admin site main hover color, css color should be specified
+    'PROFILE_PICTURE':  'coin.png',  # Admin site profile picture (path to static should be specified)
+    # 'PROFILE_BG':  'path/to/image',  # Admin site profile background (path to static should be specified)
+    'LOGIN_LOGO':  'coin.png',  # Admin site logo on login page (path to static should be specified)
+    # 'LOGOUT_BG':  'path/to/image',  # Admin site background on login/logout pages (path to static should be specified)
+    'SHOW_THEMES':  True,  #  Show default admin themes button
+    'SHOW_COUNTS': True, # Show instances counts for each model
+    'APP_ICONS': {  # Set icons for applications(lowercase), including 3rd party apps, {'application_name': 'material_icon_name', ...}
+        'lore2021': 'colorize',
+    },
+}
