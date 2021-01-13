@@ -1,7 +1,7 @@
 from math import sqrt
 
 from django.db import models
-from django.utils.timezone import now
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 
@@ -17,7 +17,17 @@ class Person(models.Model):
         ordering = ['slugname']
 
 
+class GameManager(models.Manager):
+    def get_queryset(self):
+        return models.QuerySet(
+            model=self.model,
+            using=self._db,
+            hints=self._hints
+        ).annotate(_percentage=(F('priority') * PERCENTAGE_MULTIPLICATOR / F('hours')) / 100)
+
+
 class Game(models.Model):
+    objects = GameManager()
 
     class GameLengths(models.IntegerChoices):
         SHORT = 0, _('Short game')
@@ -37,13 +47,12 @@ class Game(models.Model):
     started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
     ended = models.DateField(verbose_name='Run ended', null=True, default=None, blank=True)
 
-    @property
     def percentage(self):
-        percentage = int(self.priority*100/self.hours)/100
-        if percentage >=100 and not self.ready:
-            self.ready = now()
-            self.save()
-        return percentage
+        return float(getattr(self, '_percentage', 0))
+
+    percentage.admin_order_field = '_percentage'
+    percentage.short_description = 'Percentage'
+    percentage = property(percentage)
 
     @property
     def game_length(self):
@@ -68,7 +77,6 @@ class Game(models.Model):
 
     class Meta:
         ordering = ['name']
-
 
 
 class Donation(models.Model):
@@ -122,6 +130,15 @@ class DealerChoice(models.Model):
 class Variables(models.Model):
     class VariableList(models.IntegerChoices):
         OTHER = 0, _("Allocated dealer's choice")
+        PRIORITY = 1, _("Priority multiplicator")
 
     variable = models.IntegerField(choices=VariableList.choices, unique=True)
     value = models.CharField(max_length=200, blank=False, null=False)
+
+    def save(self, *args, **kwargs):
+        if self.variable == self.VariableList.PRIORITY:
+            PERCENTAGE_MULTIPLICATOR = float(self.value)
+        super().save(*args, **kwargs)
+
+
+PERCENTAGE_MULTIPLICATOR = float(Variables.objects.get_or_create(variable=Variables.VariableList.PRIORITY, defaults={'value': "100"})[0].value)

@@ -10,7 +10,7 @@ from datetime import timedelta
 from pyexcel_ods import get_data
 
 from .forms import ImportForm, AllocateForm
-from .models import Person, Game, Donation, DealerChoice
+from .models import Person, Game, Donation, DealerChoice, Variables
 
 
 @admin.register(Person)
@@ -64,6 +64,7 @@ class GameAdmin(admin.ModelAdmin):
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):
+    # radio_fields = {"source": admin.HORIZONTAL}
     icon_name = 'attach_money'
 
     list_display = (
@@ -185,3 +186,18 @@ class DealerChoiceAdmin(admin.ModelAdmin):
         return render(
             request, "allocate.html", payload
         )
+
+
+@admin.register(Variables)
+class VariablesAdmin(admin.ModelAdmin):
+    icon_name = 'settings_applications'
+
+    list_display = ('variable', 'value')
+    readonly_fields = ('variable',)
+    fields = ('variable', 'value')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
