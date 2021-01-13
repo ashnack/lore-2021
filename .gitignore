@@ -137,3 +137,7 @@ secretkey.txt
 # pycharm stuff
 .idea
 *.*~
+
+# extra txt files
+dealer_choice.txt
+donations.txt

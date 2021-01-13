@@ -166,8 +166,8 @@ class DealerChoiceAdmin(admin.ModelAdmin):
     icon_name = 'accessibility_new'
     change_list_template = "changelist_choice.html"
 
-    list_display = ('donator', 'amount', 'when', 'during')
-    list_filter = ('donator', 'when', 'during')
+    list_display = ('donator', 'amount', 'source', 'when', 'during')
+    list_filter = ('donator', 'source', 'when', 'during')
 
     def get_urls(self):
         urls = super().get_urls()

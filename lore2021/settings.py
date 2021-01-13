@@ -143,3 +143,6 @@ MATERIAL_ADMIN_SITE = {
         'lore2021': 'colorize',
     },
 }
+
+DEALER_CHOICE_DUMP = PurePath(BASE_DIR, 'dealer_choice.txt')
+DONATION_DUMP = PurePath(BASE_DIR, 'donations.txt')

@@ -1,7 +1,10 @@
+import datetime
 from math import sqrt
 
+from django.conf import settings
 from django.db import models
 from django.db.models import F, Sum
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
@@ -78,8 +81,7 @@ class Game(models.Model):
         ordering = ['name']
 
 
-class Donation(models.Model):
-
+class DonationBase:
     class DonationSource(models.IntegerChoices):
         OTHER = 0, _('Other source')
         PRIME_SUB = 1, _('Prime sub')
@@ -94,9 +96,26 @@ class Donation(models.Model):
         DEALER = 10, _('Dealer Choice input')
         CREDIT = 11, _('Lore credits')
 
+    @property
+    def shorthand(self):
+        if self.source == DonationBase.DonationSource.OTHER or self.source == DonationBase.DonationSource.PATREON:
+            return 'O'
+        if self.source == DonationBase.DonationSource.DIRECT:
+            return 'D'
+        if self.source == DonationBase.DonationSource.BITS:
+            return 'B'
+        return ' '
+
+    def save_trace(self, filename):
+        if self.source != Donation.DonationSource.IMPORTATION and self.source != Donation.DonationSource.DEALER:
+            with open(filename, 'w') as f:
+                print(self.shorthand + " " + self.__str__() + " [" + str(datetime.datetime.now()) + "]", file=f)
+
+class Donation(models.Model, DonationBase):
+
     donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
+    source = models.IntegerField(choices=DonationBase.DonationSource.choices)
     amount = models.FloatField(null=False, blank=False)
-    source = models.IntegerField(choices=DonationSource.choices)
     interest = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, related_name='donations')
     when = models.DateTimeField(auto_now_add=True)
     during = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
@@ -104,6 +123,8 @@ class Donation(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        if settings.DONATION_DUMP:
+            self.save_trace(settings.DONATION_DUMP)
         if 'dnu' not in kwargs:
             self.interest.update_calc()
 
@@ -113,11 +134,12 @@ class Donation(models.Model):
         Game.objects.get(pk=game_id).update_calc()
 
     def __str__(self):
-        return str(self.donator) + " gave " + str(self.amount) + " " + str(self.interest.name)
+        return str(self.donator) + " gave $" + str(self.amount) + " to " + str(self.interest.name)
 
 
-class DealerChoice(models.Model):
+class DealerChoice(models.Model, DonationBase):
     donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)
+    source = models.IntegerField(choices=DonationBase.DonationSource.choices, default=DonationBase.DonationSource.OTHER)
     amount = models.FloatField(null=False, blank=False)
     during = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
     when = models.DateTimeField(auto_now_add=True)
@@ -139,6 +161,11 @@ class DealerChoice(models.Model):
         )
         var.value = str(float(var.value)+amount)
         var.save()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if settings.DEALER_CHOICE_DUMP:
+            self.save_trace(settings.DEALER_CHOICE_DUMP)
 
 
 class Variables(models.Model):
