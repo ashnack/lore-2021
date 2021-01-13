@@ -1,11 +1,12 @@
 # ./manage.py admin_generator lore2021
 # -*- coding: utf-8 -*-
-from django.contrib import admin
+from datetime import timedelta
+
+from django.contrib import admin, messages
 from django.shortcuts import redirect, render
 from django.urls import path
 from django.utils.text import slugify
 from django.utils.timezone import now
-from datetime import timedelta
 
 from pyexcel_ods import get_data
 
@@ -151,8 +152,6 @@ class DonationAdmin(admin.ModelAdmin):
                         pass
                     game.update_calc()
                 i += 1
-
-            # ...
             self.message_user(request, "Your file has been imported")
             return redirect("..")
         form = ImportForm()
@@ -178,11 +177,30 @@ class DealerChoiceAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def allocate(self, request):
+        current_pool = DealerChoice.get_current_pool()
         if request.method == "POST":
-            self.message_user(request, "Your amount was allocated")
+            form = AllocateForm(request.POST)
+            if form.is_valid():
+                print(form.cleaned_data)
+                if form.cleaned_data['amount'] <= current_pool:
+                    a = Donation()
+                    a.donator = Person.objects.get_or_create(slugname='runner', defaults={'username': 'Runner'})[0]
+                    a.amount = form.cleaned_data['amount']
+                    a.source = Donation.DonationSource.DEALER
+                    a.interest = form.cleaned_data['choice']
+                    a.save()
+                    DealerChoice.subtract_from_pool(form.cleaned_data['amount'])
+                    self.message_user(request, "Your amount was allocated")
+                else:
+                    self.message_user(request, "Allocation amount too high, try again", level=messages.ERROR)
+            else:
+                self.message_user(request, "Your amount was NOT allocated, try again", level=messages.ERROR)
             return redirect("..")
         form = AllocateForm()
-        payload = {"form": form}
+        payload = {
+            "form": form,
+            'available': current_pool,
+        }
         return render(
             request, "allocate.html", payload
         )

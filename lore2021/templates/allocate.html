@@ -3,7 +3,8 @@
 {% block content %}
     <div>
         <h1>Delear choice allocation</h1>
-        <h2>This opration cannot be undone.</h2>
+        <h2>This opration can only be undone by changing the corresponding variable.</h2>
+        <p>The current amount available for allocation is {{available}}</p>
         <form action="." method="POST" enctype="multipart/form-data">
             {{ form.as_p }}
             {% csrf_token %}

@@ -1,7 +1,7 @@
 from math import sqrt
 
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
 
 
@@ -61,7 +61,6 @@ class Game(models.Model):
     def update_calc(self):
         amount = 0.0
         funders = set()
-        # for donation in Donation.objects.filter(interest=self).all():
         for donation in self.donations.all():
             amount += donation.amount
             funders.add(donation.donator.slugname)
@@ -126,10 +125,25 @@ class DealerChoice(models.Model):
     def __str__(self):
         return str(self.donator) + " $" + str(self.amount)
 
+    @classmethod
+    def get_current_pool(cls):
+        spent = float(Variables.objects.get_or_create(
+            variable=Variables.VariableList.ALLOCATED_DC, defaults={'value': "0"})[0].value)
+        return DealerChoice.objects.all().aggregate(Sum('amount'))['amount__sum'] - spent
+
+    @classmethod
+    def subtract_from_pool(cls, amount):
+        var, created = Variables.objects.get_or_create(
+            variable=Variables.VariableList.ALLOCATED_DC,
+            defaults={'value': "0"},
+        )
+        var.value = str(float(var.value)+amount)
+        var.save()
+
 
 class Variables(models.Model):
     class VariableList(models.IntegerChoices):
-        OTHER = 0, _("Allocated dealer's choice")
+        ALLOCATED_DC = 0, _("Allocated dealer's choice")
         PRIORITY = 1, _("Priority multiplicator")
 
     variable = models.IntegerField(choices=VariableList.choices, unique=True)
@@ -141,4 +155,5 @@ class Variables(models.Model):
         super().save(*args, **kwargs)
 
 
-PERCENTAGE_MULTIPLICATOR = float(Variables.objects.get_or_create(variable=Variables.VariableList.PRIORITY, defaults={'value': "100"})[0].value)
+PERCENTAGE_MULTIPLICATOR = float(Variables.objects.get_or_create(
+    variable=Variables.VariableList.PRIORITY, defaults={'value': "100"})[0].value)
