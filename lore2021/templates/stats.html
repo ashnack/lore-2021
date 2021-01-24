@@ -1,0 +1,11 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    {{ block.super }}
+    <h1>{{game}}</h1>
+<div>
+    {% for donation in donations %}
+        <div>{{donation}}</div>
+    {% endfor %}
+</div>
+{% endblock %}

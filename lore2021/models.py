@@ -111,6 +111,7 @@ class DonationBase:
             with open(filename, 'w') as f:
                 print(self.shorthand + " " + self.__str__() + " [" + str(datetime.datetime.now()) + "]", file=f)
 
+
 class Donation(models.Model, DonationBase):
 
     donator = models.ForeignKey(Person, on_delete=models.CASCADE, null=False, blank=False)

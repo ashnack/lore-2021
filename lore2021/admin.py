@@ -3,8 +3,9 @@
 from datetime import timedelta
 
 from django.contrib import admin, messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import path
+from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from django.utils.timezone import now
 
@@ -36,6 +37,7 @@ class GameAdmin(admin.ModelAdmin):
         'total',
         'funders',
         'priority',
+        'stats',
         'favorite',
         'added',
         'ready',
@@ -45,10 +47,15 @@ class GameAdmin(admin.ModelAdmin):
 
     change_list_template = "changelist_www.html"
 
+    def stats(self, obj):
+        return mark_safe('<a href="stats/?id=' + str(obj.pk) + '" target="_blank"><i '
+                                                               'class="material-icons">insert_chart</i></a>')
+
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
             path('website-export/', self.for_website),
+            path('stats/', self.game_stats),
         ]
         return my_urls + urls
 
@@ -59,6 +66,18 @@ class GameAdmin(admin.ModelAdmin):
             {
                 'games': Game.objects.filter(ready=None)
                     .filter(to_export=True).filter(total__gt=0).order_by('glength', '-priority').all()
+            }
+        )
+
+    def game_stats(self, request):
+        game = get_object_or_404(Game, pk=int(request.GET.get('id', 0)))
+        donations = Donation.objects.filter(interest=game).order_by('donator__slugname')
+        return render(
+            request,
+            "stats.html",
+            {
+                'game': game,
+                'donations': donations,
             }
         )
 
