@@ -106,6 +106,10 @@ class DonationBase:
             return 'B'
         return ' '
 
+    @property
+    def source_long(self):
+        return DonationBase.DonationSource.choices[self.source][1]
+
     def save_trace(self, filename):
         if self.source != Donation.DonationSource.IMPORTATION and self.source != Donation.DonationSource.DEALER:
             with open(filename, 'w') as f:

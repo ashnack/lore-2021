@@ -1,11 +1,20 @@
 {% extends 'admin/base.html' %}
+{% load humanize %}
 
 {% block content %}
     {{ block.super }}
     <h1>{{game}}</h1>
-<div>
-    {% for donation in donations %}
-        <div>{{donation}}</div>
+<ul>
+    {% regroup donations by donator as donation_list %}
+    {% for donation_grp in donation_list %}
+    <li><h3>{{ donation_grp.grouper }}</h3></li>
+    <ul>
+        {% for donation in donation_grp.list %}
+            <li>${{ donation.amount | intcomma}} from {{ donation.source_long }} ({{donation.when | naturalday}})</li>
+        {% endfor %}
+    </ul>
     {% endfor %}
-</div>
+    <h4>Copy paste this to have the donator list (sorted by descending donation priority</h4>
+    <textarea>{{donators}}</textarea>
+</ul>
 {% endblock %}

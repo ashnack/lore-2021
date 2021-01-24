@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from django.contrib import admin, messages
+from django.db.models import Sum
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import path
 from django.utils.safestring import mark_safe
@@ -72,12 +73,14 @@ class GameAdmin(admin.ModelAdmin):
     def game_stats(self, request):
         game = get_object_or_404(Game, pk=int(request.GET.get('id', 0)))
         donations = Donation.objects.filter(interest=game).order_by('donator__slugname')
+        donators = [d['donator__username'] for d in Donation.objects.filter(interest=game).values('donator__username').annotate(dsum=Sum('amount'))]
         return render(
             request,
             "stats.html",
             {
                 'game': game,
                 'donations': donations,
+                'donators': ', '.join(donators),
             }
         )
 
