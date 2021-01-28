@@ -1,6 +1,8 @@
 # ./manage.py admin_generator lore2021
 # -*- coding: utf-8 -*-
 from datetime import timedelta
+import urllib
+from urllib import request, parse
 
 from django.contrib import admin, messages
 from django.db.models import Sum
@@ -57,6 +59,7 @@ class GameAdmin(admin.ModelAdmin):
         my_urls = [
             path('website-export/', self.for_website),
             path('stats/', self.game_stats),
+            path('search-feature/', self.search_feature),
         ]
         return my_urls + urls
 
@@ -65,6 +68,48 @@ class GameAdmin(admin.ModelAdmin):
             request,
             "website.html",
             {
+                'games': Game.objects.filter(ready=None)
+                    .filter(to_export=True).filter(total__gt=0).order_by('glength', '-priority').all()
+            }
+        )
+
+    def search_feature(self, req):
+        data = []
+        with request.urlopen('https://lorerunner.com/reviews') as f:
+            html = f.read().decode('utf-8')
+            html = html[html.index('<tbody>'):html.index('</tbody')].split('</tr>')
+            for line in html:
+                if line:
+                    line = line[line.index('href=')+6:line.index('</a>')]
+                    if line:
+                        data.append({
+                            'label': parse.unquote(line[line.index('>')+1:]),
+                            'url': parse.unquote(line[0:line.index('"')]),
+                            'category': 'Reviewed',
+                        })
+        with request.urlopen('https://lorerunner.com/upcoming') as f:
+            html = f.read().decode('utf-8')
+            html = html[html.index('<ol>'):html.index('</ol>')].split('<li>')
+            for line in html:
+                if line:
+                    line_split = line.split('</li>')
+                    if len(line_split) == 2:
+                        data.append({
+                            'label': parse.unquote(line_split[0]),
+                            'url': 'https://lorerunner.com/upcoming',
+                            'category': 'Upcoming',
+                        })
+        for game in Game.objects.filter(ready=None).filter(to_export=True).filter(total__gt=0):
+            data.append({
+                'label': game.name,
+                'url': 'https://lorerunner.com/the-list',
+                'category': 'Not funded - ' + str(game.game_length),
+            })
+        return render(
+            req,
+            "search.html",
+            {
+                'data': data,
                 'games': Game.objects.filter(ready=None)
                     .filter(to_export=True).filter(total__gt=0).order_by('glength', '-priority').all()
             }
