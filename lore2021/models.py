@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
 
 
 class Person(models.Model):
@@ -44,7 +45,7 @@ class Game(models.Model):
     total = models.FloatField(null=False, blank=False, default=0.0)
     funders = models.IntegerField(null=False, blank=False, default=0)
     priority = models.IntegerField(null=False, blank=False, default=0)
-    added = models.DateField(auto_now_add=True)
+    added = models.DateField(default=now, blank=False, null=False)
     ready = models.DateField(verbose_name='Run funded', null=True, default=None, blank=True)
     started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
     ended = models.DateField(verbose_name='Run ended', null=True, default=None, blank=True)
@@ -60,6 +61,7 @@ class Game(models.Model):
         return float(getattr(self, '_percentage', 0))
 
     def days_since(self):
+        print(self.added)
         return (datetime.datetime.today().date() - self.added).days
 
     percentage.admin_order_field = '_percentage'

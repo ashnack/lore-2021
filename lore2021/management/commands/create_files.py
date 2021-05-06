@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 string += 'highlight="true"'
                 lore_choice += string + "]\n"
             with open(game.game_length + "s.txt", 'a') as f:
-                f.write(string + "]")
+                f.write(string + "]\n")
 
         if lore_choice:
             with open("lore_choice.txt", 'a') as f:
