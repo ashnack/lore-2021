@@ -61,7 +61,6 @@ class Game(models.Model):
         return float(getattr(self, '_percentage', 0))
 
     def days_since(self):
-        print(self.added)
         return (datetime.datetime.today().date() - self.added).days
 
     percentage.admin_order_field = '_percentage'
