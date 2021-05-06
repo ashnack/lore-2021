@@ -4,7 +4,6 @@ from math import sqrt
 from django.conf import settings
 from django.db import models
 from django.db.models import F, Sum
-from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
@@ -50,8 +49,18 @@ class Game(models.Model):
     started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
     ended = models.DateField(verbose_name='Run ended', null=True, default=None, blank=True)
 
+    @classmethod
+    def games_for_list(cls):
+        return cls.objects.filter(ready=None).filter(to_export=True).filter(total__gt=0).order_by(
+                'glength',
+                '-priority',
+            ).all()
+
     def percentage(self):
         return float(getattr(self, '_percentage', 0))
+
+    def days_since(self):
+        return (datetime.datetime.today().date() - self.added).days
 
     percentage.admin_order_field = '_percentage'
     percentage.short_description = 'Percentage'
@@ -187,5 +196,8 @@ class Variables(models.Model):
         super().save(*args, **kwargs)
 
 
-PERCENTAGE_MULTIPLICATOR = float(Variables.objects.get_or_create(
-    variable=Variables.VariableList.PRIORITY, defaults={'value': "100"})[0].value)
+try:
+    PERCENTAGE_MULTIPLICATOR = float(Variables.objects.get_or_create(
+        variable=Variables.VariableList.PRIORITY, defaults={'value': "100"})[0].value)
+except:
+    PERCENTAGE_MULTIPLICATOR = 100

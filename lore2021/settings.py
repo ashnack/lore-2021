@@ -17,8 +17,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Use a separate file for the secret key
-with open(PurePath(BASE_DIR, 'secretkey.txt')) as f:
-    SECRET_KEY = f.read().strip()
+try:
+    with open(PurePath(BASE_DIR, 'secretkey.txt')) as f:
+        SECRET_KEY = f.read().strip()
+except FileNotFoundError:
+    import os
+    os.system('echo "mad" > secretkey.txt')
+    os.system('python manage.py generate_secret_key --replace')
+    os.system('python manage.py migrate')
+    print('Initialization done, please restart')
+    exit()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,8 +37,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'material',
     'material.admin',
-    'material.admin.default',
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
