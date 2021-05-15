@@ -4,6 +4,6 @@
 <pre>
     {% for game in games %}
 {% ifchanged %}</pre><h3>{{ game.game_length }}</h3><pre>
-{% endifchanged %}[wppb progress="{{game.percentage|add:0}}/100" funders="{{game.funders}}" fullwidth=true text="{{game.name}}: ${{game.total|add:0}}, Time In List: {{ game.days_since }}"{% if game.favorite %} highlight="true"{% endif %}]{% endfor %}
+{% endifchanged %}[wppb progress="{{game.percentage|add:0}}/100" funders="{{game.funders}}" fullwidth=true text="{{game.name}}: ${{game.total|add:0}}, time_in_list:{{ game.days_since }}"{% if game.favorite %} highlight="true"{% endif %}]{% endfor %}
 </pre>
 {% endblock %}

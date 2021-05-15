@@ -18,13 +18,14 @@ class Command(BaseCommand):
 
         for game in Game.games_for_list():
             string = '[wppb progress="' + str(int(game.percentage) )+ '/100" funders="' + str(game.funders) + \
-                     '" fullwidth=true text="' + game.name + ': $' + str(int(game.total)) + ', Time In List: ' + \
+                     '" fullwidth=true text="' + game.name + ': $' + str(int(game.total)) + ', time_in_list:' + \
                      str(game.days_since()) + '"'
             if game.favorite:
-                string += 'highlight="true"'
+                string += ' highlight="true"'
                 lore_choice += string + "]\n"
-            with open(game.game_length + "s.txt", 'a') as f:
-                f.write(string + "]\n")
+            else:
+                with open(game.game_length + "s.txt", 'a') as f:
+                    f.write(string + "]\n")
 
         if lore_choice:
             with open("lore_choice.txt", 'a') as f:
