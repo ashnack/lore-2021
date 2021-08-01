@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils.text import slugify
 from django.utils.timezone import now
 
-from pyexcel_ods import get_data
+from pyexcel_ods3 import get_data
 
 from .models import Person, Game, Donation
 
@@ -11,9 +11,10 @@ from .models import Person, Game, Donation
 def process_odf(file):
     data = get_data(file)
     data_keys = list(data.keys())
-    # print(data_keys)
+    print("Reading sheet " + data_keys[0])
     i = 0
     data_length = len(data[data_keys[0]][4])
+    priority_list_user = Person.objects.get_or_create(slugname="prioritylistfakeuser", username="Priority List (fake user)")[0]
     while i < data_length:
         text = str(data[data_keys[0]][6][i])
         if text:
@@ -38,7 +39,10 @@ def process_odf(file):
                     'added': since
                 }
             )
-            Donation.objects.filter(interest=game).filter(source=9).delete()
+            if not created:
+                game.added = since
+                game.save()
+                Donation.objects.filter(interest=game).filter(source=9).delete()
             k = 9
             try:
                 while data[data_keys[0]][k][i]:
@@ -66,5 +70,17 @@ def process_odf(file):
                     k += 1
             except:
                 pass
+
+            if game.total < data[data_keys[0]][4][i]:
+                missing_money = data[data_keys[0]][4][i] - game.total
+                donation_object = Donation(
+                    amount=missing_money,
+                    source=9,
+                    donator=priority_list_user,
+                    during=None,
+                    interest=game,
+                )
+                donation_object.save({'dnu': True})
+
             game.update_calc()
         i += 1

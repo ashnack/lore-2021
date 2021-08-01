@@ -1,6 +1,6 @@
 import glob, os
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from lore2021.models import Game
 from lore2021.utils import process_odf
@@ -11,6 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         os.chdir('files')
+        Game.objects.all().delete()
         for file in glob.glob("*.ods"):
             process_odf(file)
 
