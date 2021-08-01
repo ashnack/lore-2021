@@ -36,11 +36,13 @@ def process_odf(file):
                     'glength': j,
                     'hours': sorter,
                     'favorite': True if lore_choice else False,
-                    'added': since
+                    'added': since,
+                    'priority_needed': data[data_keys[0]][2][i],
                 }
             )
             if not created:
                 game.added = since
+                game.priority_needed = data[data_keys[0]][2][i]
                 game.save()
                 Donation.objects.filter(interest=game).filter(source=9).delete()
             k = 9

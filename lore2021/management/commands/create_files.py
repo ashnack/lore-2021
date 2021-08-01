@@ -18,7 +18,7 @@ class Command(BaseCommand):
         lore_choice = ""
 
         for game in Game.games_for_list():
-            string = '[wppb progress="' + str(int(game.percentage) )+ '/100" funders="' + str(game.funders) + \
+            string = '[wppb progress="' + str(int(game.percentage)) + '/100" funders="' + str(game.funders) + \
                      '" fullwidth=true text="' + game.name + ': $' + str(int(game.total)) + '" time_in_list=' + \
                      str(game.days_since())
             if game.favorite:

@@ -26,7 +26,7 @@ class GameManager(models.Manager):
             model=self.model,
             using=self._db,
             hints=self._hints
-        ).annotate(_percentage=(F('priority') * PERCENTAGE_MULTIPLICATOR / F('hours')) / 100)
+        ).annotate(_percentage=(F('priority') / F('priority_needed')) * 100)
 
 
 class Game(models.Model):
@@ -45,6 +45,7 @@ class Game(models.Model):
     total = models.FloatField(null=False, blank=False, default=0.0)
     funders = models.IntegerField(null=False, blank=False, default=0)
     priority = models.IntegerField(null=False, blank=False, default=0)
+    priority_needed = models.IntegerField(null=False, blank=False, default=0)
     added = models.DateField(default=now, blank=False, null=False)
     ready = models.DateField(verbose_name='Run funded', null=True, default=None, blank=True)
     started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
@@ -58,7 +59,7 @@ class Game(models.Model):
             ).all()
 
     def percentage(self):
-        return float(getattr(self, '_percentage', 0))
+        return self.priority / self.priority_needed * 100
 
     def days_since(self):
         return (datetime.datetime.today().date() - self.added).days
@@ -78,6 +79,8 @@ class Game(models.Model):
             amount += donation.amount
             funders.add(donation.donator.slugname)
         nb_funders = len(funders)
+        if "prioritylistfakeuser" in funders:
+            nb_funders -= 1
         priority = float(sqrt(nb_funders) * amount)
         self.total = amount
         self.funders = nb_funders
