@@ -35,7 +35,8 @@ def process_odf(file):
                 defaults={
                     'glength': j,
                     'hours': sorter,
-                    'favorite': True if lore_choice else False,
+                    'favorite': True if lore_choice == 'x' else False,
+                    'streamination': True if lore_choice == 'z' else False,
                     'added': since,
                     'priority_needed': data[data_keys[0]][2][i],
                 }

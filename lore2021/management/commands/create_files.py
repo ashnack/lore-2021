@@ -16,6 +16,7 @@ class Command(BaseCommand):
             process_odf(file)
 
         lore_choice = ""
+        streaminations = ""
 
         for game in Game.games_for_list():
             string = '[wppb progress="' + str(int(game.percentage)) + '/100" funders="' + str(game.funders) + \
@@ -24,6 +25,8 @@ class Command(BaseCommand):
             if game.favorite:
                 string += ' highlight="true"'
                 lore_choice += string + "]\n"
+            elif game.streamination:
+                streaminations += string + "]\n"
             else:
                 with open(game.game_length + "s.txt", 'a') as f:
                     f.write(string + "]\n")
@@ -31,3 +34,7 @@ class Command(BaseCommand):
         if lore_choice:
             with open("lore_choice.txt", 'a') as f:
                 f.write(lore_choice)
+
+        if streaminations:
+            with open("streaminations.txt", 'a') as f:
+                f.write(streaminations)

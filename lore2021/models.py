@@ -41,6 +41,7 @@ class Game(models.Model):
     glength = models.IntegerField(choices=GameLengths.choices, null=False, blank=True)
     hours = models.IntegerField(null=False, blank=True)
     favorite = models.BooleanField(null=False, blank=False, default=False)
+    streamination = models.BooleanField(null=False, blank=False, default=False)
     to_export = models.BooleanField(null=False, blank=False, default=True, verbose_name="Export this game to the website")
     total = models.FloatField(null=False, blank=False, default=0.0)
     funders = models.IntegerField(null=False, blank=False, default=0)
