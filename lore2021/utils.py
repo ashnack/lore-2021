@@ -11,7 +11,6 @@ from .models import Person, Game, Donation
 def process_odf(file):
     data = get_data(file)
     data_keys = list(data.keys())
-    print("Reading sheet " + data_keys[0])
     i = 0
     data_length = len(data[data_keys[0]][4])
     priority_list_user = Person.objects.get_or_create(slugname="prioritylistfakeuser", username="Priority List (fake user)")[0]
@@ -47,32 +46,34 @@ def process_odf(file):
                 game.save()
                 Donation.objects.filter(interest=game).filter(source=9).delete()
             k = 9
-            try:
-                while data[data_keys[0]][k][i]:
-                    if data[data_keys[0]][k][i]:
-                        label = data[data_keys[0]][k][i]
-                        label_test = label.split(' ')
-                        donation = 2.0
-                        if len(label_test) > 1 and int(label_test[-1]) > 0:
-                            label = label[0:(len(label_test[-1])+1) * -1]
-                            donation = float(label_test[-1])
+            if data[data_keys[0]][k][i]:
+                try:
+                    while data[data_keys[0]][k][i]:
+                        if data[data_keys[0]][k][i]:
+                            label = data[data_keys[0]][k][i]
+                            label_test = label.split(' ')
+                            donation = 2.0
+                            if len(label_test) > 1 and label_test[-1] and label_test[-1].isnumeric() and int(label_test[-1]) > 0:
+                                label = label[0:(len(label_test[-1])+1) * -1]
+                                donation = float(label_test[-1])
 
-                        slug = slugify(label)
-                        pers, created = Person.objects.get_or_create(slugname=slug)
-                        if created:
-                            pers.username = label
-                            pers.save()
-                        donation_object = Donation(
-                            amount=donation,
-                            source=9,
-                            donator=pers,
-                            during=None,
-                            interest=game,
-                        )
-                        donation_object.save({'dnu': True})
-                    k += 1
-            except:
-                pass
+                            slug = slugify(label)
+                            pers, created = Person.objects.get_or_create(slugname=slug)
+                            if created:
+                                pers.username = label
+                                pers.save()
+                            donation_object = Donation(
+                                amount=donation,
+                                source=9,
+                                donator=pers,
+                                during=None,
+                                interest=game,
+                            )
+                            donation_object.save({'dnu': True})
+
+                        k += 1
+                except IndexError:
+                    pass
 
             if game.total < data[data_keys[0]][4][i]:
                 missing_money = data[data_keys[0]][4][i] - game.total
