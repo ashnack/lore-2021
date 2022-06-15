@@ -51,6 +51,7 @@ class Game(models.Model):
     ready = models.DateField(verbose_name='Run funded', null=True, default=None, blank=True)
     started = models.DateField(verbose_name='Run started', null=True, default=None, blank=True)
     ended = models.DateField(verbose_name='Run ended', null=True, default=None, blank=True)
+    days_since_change = models.IntegerField(null=False, blank=True, default=0)
 
     @classmethod
     def games_for_list(cls):

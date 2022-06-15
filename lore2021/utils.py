@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 
 from django.utils.text import slugify
 from django.utils.timezone import now
@@ -28,7 +28,10 @@ def process_odf(file):
                 lore_choice = str(data[data_keys[0]][1][i]).lower()
             except IndexError:
                 lore_choice = ''
-            since = now() - timedelta(days=int(data[data_keys[0]][8][i]))
+            if isinstance(data[data_keys[0]][8][i], date):
+                since = data[data_keys[0]][8][i]
+            else:
+                since = now() - timedelta(days=int(data[data_keys[0]][8][i]))
             game, created = Game.objects.get_or_create(
                 name=text,
                 defaults={
@@ -38,6 +41,7 @@ def process_odf(file):
                     'streamination': True if lore_choice == 'z' else False,
                     'added': since,
                     'priority_needed': data[data_keys[0]][2][i],
+                    'days_since_change': data[data_keys[0]][10][i],
                 }
             )
             if not created:
@@ -45,7 +49,7 @@ def process_odf(file):
                 game.priority_needed = data[data_keys[0]][2][i]
                 game.save()
                 Donation.objects.filter(interest=game).filter(source=9).delete()
-            k = 9
+            k = 11
             if data[data_keys[0]][k][i]:
                 try:
                     while data[data_keys[0]][k][i]:
