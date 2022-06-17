@@ -41,7 +41,7 @@ def process_odf(file):
                     'streamination': True if lore_choice == 'z' else False,
                     'added': since,
                     'priority_needed': data[data_keys[0]][2][i],
-                    'days_since_change': data[data_keys[0]][9][i],
+                    'days_since_change': data[data_keys[0]][9][i]+1,
                 }
             )
             if not created:
