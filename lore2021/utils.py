@@ -41,7 +41,7 @@ def process_odf(file):
                     'streamination': True if lore_choice == 'z' else False,
                     'added': since,
                     'priority_needed': data[data_keys[0]][2][i],
-                    'days_since_change': data[data_keys[0]][10][i],
+                    'days_since_change': data[data_keys[0]][9][i],
                 }
             )
             if not created:
@@ -55,6 +55,8 @@ def process_odf(file):
                     while data[data_keys[0]][k][i]:
                         if data[data_keys[0]][k][i]:
                             label = data[data_keys[0]][k][i]
+                            if isinstance(label, int):
+                                print('missing name on column ' + str(i) + ' => ' + text)
                             label_test = label.split(' ')
                             donation = 2.0
                             if len(label_test) > 1 and label_test[-1] and label_test[-1].isnumeric() and int(label_test[-1]) > 0:
