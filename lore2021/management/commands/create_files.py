@@ -29,7 +29,7 @@ class Command(BaseCommand):
             elif game.streamination:
                 streaminations += string + "]\n"
             else:
-                with open(game.game_length + "s.txt", 'a') as f:
+                with open("games.txt", 'a') as f:
                     f.write(string + "]\n")
 
         if lore_choice:
