@@ -9,7 +9,7 @@ from .models import Person, Game, Donation
 
 
 def process_odf(file):
-    data = get_data(file)
+    data = get_data(file, keep_trailing_empty_cells=True)
     data_keys = list(data.keys())
     i = 0
     data_length = len(data[data_keys[0]][4])
