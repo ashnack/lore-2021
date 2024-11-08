@@ -17,7 +17,12 @@ def process_odf(file):
     while i < data_length:
         text = str(data[data_keys[0]][6][i])
         if text:
-            sorter = int(data[data_keys[0]][3][i]) if data[data_keys[0]][3][i] else 0
+            try:
+                sorter = int(data[data_keys[0]][3][i]) if data[data_keys[0]][3][i] else 0
+            except:
+                print("WARNING, row failed: " + text + " - " + str(i) + " of " + str(data_length))
+                i += 1
+                continue
             j = 2
             if sorter < 15:
                 j = 0
